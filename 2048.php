@@ -3,7 +3,7 @@
 Plugin Name: 2048
 Plugin URI: http://www.envigeek.com/
 Description: 2048 is a number combination game with the aim to achieve 2048 tile.
-Version: 0.1
+Version: 0.1.1
 Author: Envigeek Web Services
 Author URI: http://www.envigeek.com/
 
@@ -22,7 +22,7 @@ Author URI: http://www.envigeek.com/
 
 */
 
-define('WP2048_VERSION', '0.1');
+define('WP2048_VERSION', '0.1.1');
 
 function wp2048_enqueue() {
 	wp_register_script( '2048_bind_polyfill', plugins_url( 'js/bind_polyfill.js' , __FILE__ ), array(), WP2048_VERSION, true );

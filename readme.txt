@@ -3,7 +3,7 @@ Contributors: envigeek
 Tags: 2048, game, number, number game,
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 0.1
+Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,8 @@ Based on the open-source works of [Gabriele Cirulli](http://gabrielecirulli.gith
 1. If you get the 2048 tile.
 
 == Changelog ==
+= 0.1.1 =
+* Fix CSS Container
 = 0.1 =
 * Initial release.
 
