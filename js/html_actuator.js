@@ -3,6 +3,8 @@ function HTMLActuator() {
   this.scoreContainer   = document.querySelector(".score-container");
   this.bestContainer    = document.querySelector(".best-container");
   this.messageContainer = document.querySelector(".game-message");
+  this.sitescoreContainer = document.querySelector(".sitescore-container");
+  this.scoreForm = document.querySelector("#wp2048");
 
   this.score = 0;
 }
@@ -60,9 +62,16 @@ HTMLActuator.prototype.addTile = function (tile) {
   if (tile.value > 2048) classes.push("tile-super");
 
   this.applyClasses(wrapper, classes);
-
+  
   inner.classList.add("tile-inner");
-  inner.textContent = tile.value;
+  
+  // use custom tile texts if custom game theme
+  var customtext = wp2048.customtext;
+  if (window.wp2048_customtext && customtext.length) {
+	inner.textContent = customtext[(Math.log(tile.value) / Math.LN2)-1] || '';
+  } else {
+    inner.textContent = tile.value;
+  }
 
   if (tile.previousPosition) {
     // Make sure that the tile gets rendered in the previous position first
@@ -130,10 +139,30 @@ HTMLActuator.prototype.message = function (won) {
 
   this.messageContainer.classList.add(type);
   this.messageContainer.getElementsByTagName("p")[0].textContent = message;
+
+  this.scoreForm.appendChild(this.scoreInput());
+  if ( this.score > wp2048.highscore ) {
+	if ( document.body.classList.contains("logged-in") ) {
+		// Simulate AJAX form submit by clicking the button
+		this.scoreForm.getElementsByTagName('button')[0].click();
+	} else if ( wp2048.guest == false ) {
+		this.scoreForm.style.display = 'none';
+	}
+  } else {
+	this.scoreForm.style.display = 'none';
+  }
 };
 
 HTMLActuator.prototype.clearMessage = function () {
   // IE only takes one value to remove at a time.
   this.messageContainer.classList.remove("game-won");
   this.messageContainer.classList.remove("game-over");
+};
+
+HTMLActuator.prototype.scoreInput = function () {
+  var hiddenInput = document.createElement("input");
+  hiddenInput.type = 'hidden';
+  hiddenInput.name = 'score';
+  hiddenInput.value = this.score;
+  return hiddenInput;
 };
