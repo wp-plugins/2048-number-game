@@ -147,6 +147,8 @@ HTMLActuator.prototype.message = function (won) {
 		this.scoreForm.getElementsByTagName('button')[0].click();
 	} else if ( wp2048.guest == false ) {
 		this.scoreForm.style.display = 'none';
+	} else {
+		this.scoreForm.style.display = 'block';
 	}
   } else {
 	this.scoreForm.style.display = 'none';

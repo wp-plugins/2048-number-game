@@ -34,11 +34,12 @@ On the *Custom Features* tab of plugin settings page, make the changes you wante
 Yes, technically it will work. Depends on your theme, your widget width may not fit the game board thus may cause unexpected result. It is always recommended to have the game board on its own page or post.
 
 == Screenshots ==
-1. High score submitted automatically when you logged-in.
+1. Submit high score when game ended.
 1. Easily add the game shortcode on post editor.
 1. The plugin settings page.
 1. Various customizations to the game appearance.
 1. Generate customized shortcode easily.
+1. Widget that shows current highest score.
 
 == Changelog ==
 = 0.2 =
