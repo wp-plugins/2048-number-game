@@ -1,9 +1,13 @@
 <?php
+defined( 'ABSPATH' ) OR exit;
+
+$wp2048_settings = new WP2048_Settings();
 class WP2048_Settings extends WP2048
-{	
+{		
 	public function __construct()
-    {
+    {		
 		parent::properties();
+		parent::textdomain();
 		
         add_action( 'admin_menu', array( $this, 'settings_menu' ) );
         add_action( 'admin_init', array( $this, 'settings_init' ) );
@@ -15,12 +19,17 @@ class WP2048_Settings extends WP2048
      */
 	public function settings_enqueue()
 	{
-		wp_enqueue_style( '2048_settings', plugins_url( 'css/settings.css' , dirname(__FILE__) ), array('wp-color-picker'), $this->version );
-		wp_enqueue_script( '2048_settings', plugins_url( 'js/settings.js' , dirname(__FILE__) ), array('wp-color-picker','thickbox','media-upload'), $this->version , true );
+		wp_enqueue_style( '2048_settings', plugins_url( 'css/settings.css' , dirname(__FILE__) ), array('wp-color-picker'), self::VER );
+		wp_enqueue_media();
+		wp_enqueue_script( '2048_settings', plugins_url( 'js/settings.js' , dirname(__FILE__) ), array('wp-color-picker'), self::VER , true );
 		wp_localize_script( '2048_settings', 'wp2048', 
 			array(
 				'ajaxurl'		=> admin_url('admin-ajax.php'),
 				'nonce' 		=> wp_create_nonce('wp2048_ajax'),
+				'media_modal_title' => __('Add Image to 2048 Tile', 'wp2048'),
+				'media_modal_button' => __('Assign Image', 'wp2048'),
+				'alert_image_size' => __('Minimum image dimension is 107px width and height.', 'wp2048'),
+				'alert_not_image' => __('Selected media not a valid image format.', 'wp2048'),
 			) 
 		);
 	}
@@ -108,6 +117,24 @@ class WP2048_Settings extends WP2048
         );
 		
 		add_settings_field(
+            'scoreboard', // ID
+            'Score Board', // Title 
+            array( $this, 'checkbox_callback' ), // Callback
+            'wp2048_options_page', // Page
+            'wp2048_options_general', // Section 
+			array( 'field' => 'scoreboard', 'label' => 'Check to enable storing each user\'s high score' )			
+        );
+		
+		add_settings_field(
+            'displayname', // ID
+            'Display Name', // Title 
+            array( $this, 'checkbox_callback' ), // Callback
+            'wp2048_options_page', // Page
+            'wp2048_options_general', // Section 
+			array( 'field' => 'displayname', 'label' => 'Score board will list user by their display name option. Can be overridden in shortcode.' )			
+        );
+		
+		add_settings_field(
             'guest_highscore', // ID
             'Guest High Score', // Title 
             array( $this, 'checkbox_callback' ), // Callback
@@ -124,6 +151,15 @@ class WP2048_Settings extends WP2048
             'wp2048_options_general' // Section 		
         );
 		
+		add_settings_field(
+            'userscore', // ID
+            'User Score', // Title 
+            array( $this, 'checkbox_callback' ), // Callback
+            'wp2048_options_page', // Page
+            'wp2048_options_general', // Section 
+			array( 'field' => 'userscore', 'label' => 'Notify users when they update own high score' )			
+        );
+		
 		// Email Templates
 		add_settings_section(
             'wp2048_options_email', // ID
@@ -138,7 +174,7 @@ class WP2048_Settings extends WP2048
             array( $this, 'email_template_callback' ), 
             'wp2048_options_page', 
             'wp2048_options_email',
-			array( 'field' => 'highscore_new', 'desc' => 'Congratulates on achiving site\'s new high score.' )	
+			array( 'field' => 'highscore_new', 'desc' => 'Congratulates on achieving site\'s new high score' )
         );
 		
 		add_settings_field(
@@ -148,6 +184,15 @@ class WP2048_Settings extends WP2048
             'wp2048_options_page', 
             'wp2048_options_email',
 			array( 'field' => 'highscore_lost', 'desc' => 'Sent to previous user their high score just broken' )	
+        );
+		
+		add_settings_field(
+            'highscore_user', 
+            'User High Score', 
+            array( $this, 'email_template_callback' ), 
+            'wp2048_options_page', 
+            'wp2048_options_email',
+			array( 'field' => 'highscore_user', 'desc' => 'Congratulates on updating own high score' )	
         );
 		
 		// Advanced Options
@@ -182,7 +227,16 @@ class WP2048_Settings extends WP2048
             array( $this, 'checkbox_callback' ), // Callback
             'wp2048_options_page', // Page
             'wp2048_options_advanced', // Section 
-			array( 'field' => 'delete', 'label' => 'Remove all plugin data upon de-activation' )			
+			array( 'field' => 'delete', 'label' => 'Remove plugin settings and customizations (excluding high scores) upon de-activation. Re-activation will reset plugin settings to default.' )			
+        );
+		
+		add_settings_field(
+            'delscores', // ID
+            'Delete High Scores', // Title 
+            array( $this, 'checkbox_callback' ), // Callback
+            'wp2048_options_page', // Page
+            'wp2048_options_advanced', // Section 
+			array( 'field' => 'delscores', 'label' => 'WARNING! Remove all stored high scores upon plugin un-installation.' )			
         );
 		
 		/**
@@ -427,7 +481,7 @@ class WP2048_Settings extends WP2048
 			<div class="highscore-container">'.$this->highscore['score'].'</div>
 			<div class="userscore-container">'.$hs_user.'</div>
 		</div>';
-		echo 'The plugin only stores the highest score. When someone ended a game (either won or game over) and if their high score more than your site\'s high score, it will submit the score to be saved. It is automatically submitted for any logged-in users. If you enabled to allow non logged-in users to submit high score, an email field will appear to them before the score submission. The email address is required to notify them of high score updates.';
+		echo 'The game keep the site\'s high score and every logged-in user\'s high score when score board is enabled. When someone ended a game (either won or game over) and if their high score more than your site\'s high score or their personal high score record, the game will save the new score. It is automatically saved for any logged-in users. If you enable to allow guest users to submit high score, an email field will appear to them before the score submission. The email address is required to notify them of new high score updates.';
     }
 	
     public function print_section_email()
@@ -443,6 +497,9 @@ class WP2048_Settings extends WP2048
     public function print_section_customize()
     {
 		echo '<p>This settings page is for default values when you are using shortcode <code>[2048 custom=1]</code> or when you have set to default the game to use the custom features on the <a href="'.site_url('/wp-admin/options-general.php?page=wp2048').'">settings</a> tab. You able to customize various cosmetic elements of the game. For any fields you left blank or did not check the box(es) of enabled features, that particular option will fall back into the original 2048 appearance.</p>';
+		
+		echo '<strong>Tips on using custom image for tiles</strong>';
+		echo '<p>Minimum image dimension is 107px width and height. The game tiles resizes to 58px on smaller screens. Recommended to use a perfect square image. The plugin will force your image to appear in perfect square anyway. Do not use transparent PNGs as you will see overlapping image tiles when merging tiles.</p>';
 		
 		//$this->print_customize_preview();
     }
@@ -653,11 +710,16 @@ class WP2048_Settings extends WP2048
             $tile, !empty( $this->custom['size'][$tile] ) ? esc_attr( $this->custom['size'][$tile] ) : ''
         );
 		
+		echo '<br/>';
+		
 		// Image Upload
-		$img = !empty( $this->custom['image'][$tile] ) ? esc_attr( $this->custom['image'][$tile] ) : '';
-		printf( '<div><img class="upload_preview" src="%s" /></div>', $img );
-        printf( '<input type="text" class="regular-text upload_field" name="wp2048_custom[image][%1$s]" value="%2$s" />', $tile, $img );
-		echo '<input type="button" class="button upload_button" value="Upload" /><input type="button" class="button upload_clear" value="Remove" />';
+		$default_img = 'http://placehold.it/107&text='.$tile;
+		$img = !empty( $this->custom['image'][$tile] ) ? esc_attr( $this->custom['image'][$tile] ) : $default_img;
+		printf( '<div><img class="upload_preview" src="%1$s" data-default="%2$s" /></div>', $img, $default_img );
+        printf( '<input type="hidden" class="regular-text upload_field" name="wp2048_custom[image][%1$s]" value="%2$s" />', $tile, $img );
+		echo '<input type="button" class="button upload_button" value="Select Image" />&nbsp;&nbsp;<input type="button" class="button upload_clear" value="Remove Image" />';
+		
+		echo '<br/>';
 		
 		// Color Picker
 		$default = array('#eee4da','#ede0c8','#f2b179','#f59563','#f67c5f','#f65e3b','#edcf72','#edcc61','#edc850','#edc53f','#edc22e');
@@ -720,4 +782,3 @@ class WP2048_Settings extends WP2048
 	  </div>';
     }
 }
-$wp2048_settings = new WP2048_Settings();

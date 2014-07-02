@@ -9,26 +9,62 @@ jQuery(document).ready(function($) {
 	});
 	
 	var upload_field, upload_preview;
-	if ($('.upload_button').length) {
-		$('.upload_button').on('click', function(e) {
-			upload_field = $(this).closest('td').find('input.upload_field:first');
-			upload_preview = $(this).closest('td').find('img.upload_preview:first');
-			window.send_to_editor=window.send_to_editor_clone;
-			tb_show('','media-upload.php?TB_iframe=true');
-			return false;
+	jQuery('.upload_button').on( 'click', function( event ) {
+		event.preventDefault();
+		
+		var $el = $(this);
+		upload_field = $el.closest('td').find('input.upload_field:first');
+		upload_preview = $el.closest('td').find('img.upload_preview:first');
+
+		var insertImage = wp.media.controller.Library.extend({
+			defaults :  _.defaults({
+				id: 'wp2048-image',
+				title: wp2048.media_modal_title,
+				allowLocalEdits: true,
+				displaySettings: true,
+				displayUserSettings: false,
+				multiple : false,
+				type : 'image'
+			}, wp.media.controller.Library.prototype.defaults )
 		});
-		window.original_send_to_editor = window.send_to_editor;
-		window.send_to_editor_clone = function(html){
-			file_url = jQuery('img',html).attr('src');
-			if (!file_url) { file_url = jQuery(html).attr('href'); }
-			tb_remove();
-			upload_field.val(file_url);
-			upload_preview.attr('src', file_url);
-		}
-	}
+		var frame = wp.media({
+			button : { text : wp2048.media_modal_button },
+			state : 'wp2048-image',
+			states : [
+				new insertImage()
+			]
+		});
+		
+		frame.on( 'select', function() {
+			var state = frame.state('wp2048-image');
+			var selection = state.get('selection');
+
+			if ( ! selection ) return;
+
+			selection.each( function(attachment) {
+				var display = state.display( attachment ).toJSON();
+				var obj_attachment = attachment.toJSON();
+				var obj_display = wp.media.string.props( display, obj_attachment );
+				if ( 'image' === obj_attachment.type ) {
+					if ( obj_display.height < 107 || obj_display.width < 107 ) {
+						alert(wp2048.alert_image_size);
+					} else {
+						upload_field.val( obj_display.src );
+						upload_preview.attr( 'src', obj_display.src ).show();
+					}
+				} else {
+					alert(wp2048.alert_not_image);
+				}
+			});
+		});
+		
+		frame.open();
+	});
+	
 	$('.upload_clear').on('click', function(e) {
 		$(this).closest('td').find('input.upload_field:first').val('');
-		$(this).closest('td').find('img.upload_preview:first').hide();
+		var defimg = $(this).closest('td').find('img.upload_preview:first').attr('data-default');
+		$(this).closest('td').find('img.upload_preview:first').attr('src',defimg);
 		return false;
 	});
 	

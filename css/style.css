@@ -164,6 +164,13 @@
 
   100% {
     opacity: 1; } }
+	
+.wp2048 .game-container:fullscreen, .wp2048 .game-container:-webkit-full-screen, .wp2048 .game-container:-moz-full-screen {
+    position: fixed;
+	top: 50%;
+	left: 50%;
+}
+
 .wp2048 .game-container {
   margin-top: 40px;
   position: relative;
@@ -209,12 +216,12 @@
 	.wp2048 .game-message .lower {
 	  display: block;
       margin-top: 29px; }
-	.wp2048 .game-message .mailing-list {
+	.wp2048 .game-message .high-score {
       margin-top: 52px; }
-    .wp2048 .game-message .mailing-list strong {
+    .wp2048 .game-message .high-score strong {
       display: block;
       margin-bottom: 10px; }
-    .wp2048 .game-message .mailing-list .mailing-list-email-field {
+    .wp2048 .game-message .high-score .high-score-email-field {
       width: 230px;
       margin-right: 5px; }
 	  
@@ -248,7 +255,7 @@
       -webkit-animation-fill-mode: both;
       -moz-animation-fill-mode: both;
       animation-fill-mode: both; }
-	  .wp2048 .game-message.game-won .mailing-list, .wp2048 .game-message.game-over .mailing-list {
+	  .wp2048 .game-message.game-won .high-score, .wp2048 .game-message.game-over .high-score {
       -webkit-animation: fade-in 1.5s ease-in-out 2500ms;
       -moz-animation: fade-in 1.5s ease-in-out 2500ms;
       animation: fade-in 1.5s ease-in-out 2500ms;
@@ -553,6 +560,19 @@
   display: block;
   text-align: center;
   float: right; }
+  
+.wp2048 .fullscreen-button {
+  display: inline-block;
+  background: #8f7a66;
+  border-radius: 3px;
+  padding: 0 20px;
+  text-decoration: none;
+  color: #f9f6f2;
+  height: 40px;
+  line-height: 42px;
+  display: block;
+  text-align: center;
+  float: left; }
 
 .wp2048 .game-explanation {
   margin-top: 50px; }
@@ -580,7 +600,7 @@
     box-sizing: border-box;
     line-height: 1.65; }
 
-  .wp2048 .restart-button {
+  .wp2048 .restart-button, .wp2048 .fullscreen-button {
     width: 42%;
     padding: 0;
     display: block;
@@ -632,12 +652,12 @@
 	  .wp2048 .game-message .lower {
         display: block;
         margin-top: 29px; }
-      .wp2048 .game-message .mailing-list {
+      .wp2048 .game-message .high-score {
         margin-top: 52px; }
-      .wp2048 .game-message .mailing-list strong {
+      .wp2048 .game-message .high-score strong {
         display: block;
         margin-bottom: 10px; }
-      .wp2048 .game-message .mailing-list .mailing-list-email-field {
+      .wp2048 .game-message .high-score .high-score-email-field {
         width: 230px;
         margin-right: 5px; }
       .wp2048 .game-message a {
@@ -670,7 +690,7 @@
         -webkit-animation-fill-mode: both;
         -moz-animation-fill-mode: both;
         animation-fill-mode: both; }
-      .wp2048 .game-message.game-won .mailing-list, .wp2048 .game-message.game-over .mailing-list {
+      .wp2048 .game-message.game-won .high-score, .wp2048 .game-message.game-over .high-score {
         -webkit-animation: fade-in 1.5s ease-in-out 2500ms;
         -moz-animation: fade-in 1.5s ease-in-out 2500ms;
         animation: fade-in 1.5s ease-in-out 2500ms;
@@ -789,9 +809,9 @@
       margin-top: 10px !important; }
     .wp2048 .game-message.game-won .score-sharing {
       margin-top: 10px; }
-    .wp2048 .game-message.game-over .mailing-list {
+    .wp2048 .game-message.game-over .high-score {
       margin-top: 25px; }
-    .wp2048 .game-message .mailing-list {
+    .wp2048 .game-message .high-score {
       margin-top: 10px; }
-      .wp2048 .game-message .mailing-list .mailing-list-email-field {
+      .wp2048 .game-message .high-score .high-score-email-field {
         width: 180px; } }

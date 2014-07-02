@@ -5,6 +5,10 @@
 	color:#ffffff;
 }
 
+.attachment-details .setting, .attachment-display-settings > label.setting:first-of-type, .attachment-display-settings > div.setting {
+	display: none;
+}
+
 .scores-container {
   float: right;
   text-align: right; }

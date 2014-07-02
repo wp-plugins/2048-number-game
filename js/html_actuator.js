@@ -141,14 +141,18 @@ HTMLActuator.prototype.message = function (won) {
   this.messageContainer.getElementsByTagName("p")[0].textContent = message;
 
   this.scoreForm.appendChild(this.scoreInput());
-  if ( this.score > wp2048.highscore ) {
+  if ( this.score > wp2048.highscore || this.score > wp2048.userscore ) {
 	if ( document.body.classList.contains("logged-in") ) {
 		// Simulate AJAX form submit by clicking the button
 		this.scoreForm.getElementsByTagName('button')[0].click();
-	} else if ( wp2048.guest == false ) {
-		this.scoreForm.style.display = 'none';
 	} else {
-		this.scoreForm.style.display = 'block';
+		// checks if guest allowed to submit high score
+		if ( wp2048.guest == false ) {
+			this.scoreForm.style.display = 'none';
+		} else {
+			if ( this.score > wp2048.highscore )
+				this.scoreForm.style.display = 'block';
+		}
 	}
   } else {
 	this.scoreForm.style.display = 'none';

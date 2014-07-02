@@ -1,10 +1,9 @@
 === 2048 ===
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Q8MNNQVXDSJZG
 Contributors: envigeek
 Tags: 2048, game, number, number game,
 Requires at least: 3.5
-Tested up to: 3.9
-Stable tag: 0.2
+Tested up to: 3.9.1
+Stable tag: 0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,9 +23,15 @@ Based on the open-source game created by [Gabriele Cirulli](http://gabrielecirul
 
 To customize the game appearances, go to **Settings > 2048 Number Game > Custom Features** to change the colors, text or number appeared on tiles, the font sizes and also to use image as the tile.
 
+A widget is available to show site's high score or your top 5 scores, and can be linked to your choice of page that contains the game board.
+
+Use shortcode [scoreboard2048] to display a list of your logged-in users high score.
+
 == Frequently Asked Questions ==
 = How the high score works? =
-The plugin only stores the highest score. When someone ended a game (either won or game over) and if their high score more than your site's high score, it will submit the score to be saved. It is automatically submitted for any logged-in users. If you enabled to allow non logged-in users to submit high score, an email field will appear to them before the score submission. The email address is required to notify them of high score updates.
+Since version 0.3, the plugin can store each logged-in users high score is enabled in the settings. Previous version only keep a single high score for the site.
+
+When someone ended a game (either won or game over) and if their high score more than your site\'s high score or their personal high score record, the game will save the new score. It is automatically saved for any logged-in users. If you enable to allow guest users to submit high score, an email field will appear to them before the score submission. The email address is required to notify them of new high score updates.
 
 = How the use the custom shortcode generator? =
 On the *Custom Features* tab of plugin settings page, make the changes you wanted to customized colors, tiles text and font size, or using image as tiles. Check or uncheck the *Enabled Features* as required. Without saving the changes, click the **Generate** button and a textarea will be shown with the custom shortcode. Copy the shortcode and paste it on your page or post. Publish/save it to see the game in custom appearances.
@@ -43,6 +48,13 @@ Yes, technically it will work. Depends on your theme, your widget width may not 
 1. Widget that shows current highest score.
 
 == Changelog ==
+= 0.3 =
+* New: Stores high scores on each logged-in users
+* New: Score board listing site's users scores
+* New: Play game in Full Screen mode (Beta feature)
+* Enhancements: Upgrade image tile selector to use WordPress new Media Modal
+* Fix: Image tile not appearing
+* Fix: Widget page option not saving
 = 0.2 =
 * New: Now stores the highest score into WordPress database.
 * New: Notify user when their score was beaten by someone else.
@@ -62,5 +74,7 @@ Yes, technically it will work. Depends on your theme, your widget width may not 
 * Initial release.
 
 == Upgrade Notice ==
+= 0.3 =
+* Now store each users high score, scoreboard, play in full screen and several bug fixes plus enhancements
 = 0.2 =
 * Enhancements: Store High Score, Configurable Custom Colors and Image Tiles
