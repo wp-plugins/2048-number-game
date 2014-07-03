@@ -3,7 +3,7 @@
 Plugin Name: 2048
 Plugin URI: http://wordpress.org/plugins/2048-number-game/
 Description: 2048 is a number combination game with the aim to achieve 2048 tile.
-Version: 0.3
+Version: 0.3.1
 Author: Envigeek Web Services
 Author URI: http://www.envigeek.com/
 
@@ -21,10 +21,13 @@ Author URI: http://www.envigeek.com/
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+register_activation_hook( __FILE__, array( 'WP2048', 'activation' ) );
+register_deactivation_hook( __FILE__, array( 'WP2048', 'deactivation' ) );
+
 add_action( 'plugins_loaded', array( 'WP2048', 'init' ) );
 class WP2048
 {
-	const VER = '0.3.01';
+	const VER = '0.3.1';
 
 	protected $tiles, $option, $custom, $highscore;
 	
@@ -77,6 +80,69 @@ class WP2048
 	protected function textdomain() {
 		load_plugin_textdomain( 'wp2048', false, dirname( plugin_basename( __FILE__ ) ) . '/lang/' ); 
 	}
+	
+	/**
+	 * Register Default Values upon Activation
+	 */
+	public static function activation()
+	{	
+		if ( ! current_user_can( 'activate_plugins' ) )
+            return;
+        $plugin = isset( $_REQUEST['plugin'] ) ? $_REQUEST['plugin'] : '';
+        check_admin_referer( "activate-plugin_{$plugin}" );
+		
+		$email_template = array(
+			'highscore_new' => array(
+				'subject' => 'Your 2048 high score',
+				'message' => 'Congratulations! You get the high score of %%SCORE%% on 2048 number game at '.home_url()
+			),
+			'highscore_lost' => array(
+				'subject' => 'You lost the 2048 high score',
+				'message' => 'Someone beat your high score on 2048 number game. Play 2048 again on '.home_url().' to beat the new score of %%SCORE%%'
+			),
+			'highscore_user' => array(
+					'subject' => 'Your new 2048 high score',
+					'message' => 'Congratulations on your high score of %%SCORE%% on 2048 number game. Play 2048 again at '.home_url()
+			),
+		);
+		$default_options = array(
+			'customization' => 0, // default to original 2048
+			'hide_howto' => 0, // dont hide
+			'scoreboard' => 1,
+			'guest_highscore' => 1, // allow non logged-in to submit score
+			'notify' => 3, // send to both scenarios
+			'userscore' => 1,
+			'email_template' => $email_template,
+			'tx_viewport' => 'width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui',
+		);
+		$default_highscore = array(
+			'uid' => 0,
+			'email' => '',
+			'score' => 0
+		);
+		
+		// add_option already include self check if option already exists
+		add_option('wp2048_options', $default_options);
+		add_option('wp2048_highscore', json_encode($default_highscore));
+    }
+	 
+	/**
+	 * Remove Data upon De-activation
+	 */
+	public static function deactivation() 
+	{
+		if ( ! current_user_can( 'activate_plugins' ) )
+            return;
+        $plugin = isset( $_REQUEST['plugin'] ) ? $_REQUEST['plugin'] : '';
+        check_admin_referer( "deactivate-plugin_{$plugin}" );
+		
+        // check option to remove data upon deactivation
+		$options = get_option('wp2048_options');
+		if ( !empty($options['delete']) ) {
+			delete_option('wp2048_options');
+			delete_option('wp2048_custom');
+		}
+    }
 	
 	/**
 	 * Checks if need to update plugin options or data
@@ -339,32 +405,36 @@ class WP2048
 			'meta_compare' => '>',
 		) );
 		
-		echo '<table>';
-		echo '<tr><th>'.__('User', 'wp2048').'</th><th>'.__('Score', 'wp2048').'</th></tr>';
-	
-		$highscore_user = __('Guest', 'wp2048');
-		if ( $this->highscore['uid'] != 0 ) {
-			$highscore_user = ($displayname) ? get_the_author_meta( 'display_name', $this->highscore['uid'] ) : get_the_author_meta( 'user_login', $this->highscore['uid'] );
-		}
+		if ( $this->highscore['score'] != 0 ) {
+			echo '<table>';
+			echo '<tr><th>'.__('User', 'wp2048').'</th><th>'.__('Score', 'wp2048').'</th></tr>';
 		
-		echo '<tr><td>'.$highscore_user.'</td><td>'.$this->highscore['score'].'</td></tr>';
-		foreach ( $scoreboard->results as $user ) {
-			$user_id = $user->data->ID;
-			echo '<tr>';
-			$user_name = ($displayname) ? $user->data->display_name: $user->data->user_login;
-			if ( $link == 'website' ) {
-				$user_url = get_the_author_meta( 'user_url', $user_id );
-			} else if ( $link == 'posts' && count_user_posts( $user_id ) > 0 ) {
-				$user_url = get_author_posts_url( $user_id );
-			} else if ( $link == 'buddypress' && function_exists('bp_core_get_user_domain') ) {
-				$user_url = bp_core_get_user_domain( $user_id );
+			$highscore_user = __('Guest', 'wp2048');
+			if ( $this->highscore['uid'] != 0 ) {
+				$highscore_user = ($displayname) ? get_the_author_meta( 'display_name', $this->highscore['uid'] ) : get_the_author_meta( 'user_login', $this->highscore['uid'] );
 			}
-			$user_name = !empty($user_url) ? '<a href="'.$user_url.'">'.$user_name.'</a>' : $user_name;
-			echo '<td>'.$user_name.'</td>';
-			echo '<td>'.get_user_meta($user->data->ID, 'wp2048_score', true).'</td>';
-			echo '</tr>';
+			
+			echo '<tr><td>'.$highscore_user.'</td><td>'.$this->highscore['score'].'</td></tr>';
+			foreach ( $scoreboard->results as $user ) {
+				$user_id = $user->data->ID;
+				echo '<tr>';
+				$user_name = ($displayname) ? $user->data->display_name: $user->data->user_login;
+				if ( $link == 'website' ) {
+					$user_url = get_the_author_meta( 'user_url', $user_id );
+				} else if ( $link == 'posts' && count_user_posts( $user_id ) > 0 ) {
+					$user_url = get_author_posts_url( $user_id );
+				} else if ( $link == 'buddypress' && function_exists('bp_core_get_user_domain') ) {
+					$user_url = bp_core_get_user_domain( $user_id );
+				}
+				$user_name = !empty($user_url) ? '<a href="'.$user_url.'">'.$user_name.'</a>' : $user_name;
+				echo '<td>'.$user_name.'</td>';
+				echo '<td>'.get_user_meta($user->data->ID, 'wp2048_score', true).'</td>';
+				echo '</tr>';
+			}
+			echo '</table>';
+		} else {
+			echo '<p>'.__('No high score recorded yet.', 'wp2048').'</p>';
 		}
-		echo '</table>';
 	}
 
 	/**

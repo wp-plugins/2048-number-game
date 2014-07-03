@@ -3,14 +3,14 @@ Contributors: envigeek
 Tags: 2048, game, number, number game,
 Requires at least: 3.5
 Tested up to: 3.9.1
-Stable tag: 0.3
+Stable tag: 0.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 2048 is a number combination game with the aim to achieve 2048 tile.
 
 == Description ==
-Join the numbers and get to the 2048 tile! This is a number combination game with the aim to achieve 2048 tile. Display the game based on the original 2048 design or customized the game appearance to your choice of colors, tile's text or numbers, font sizes or even use image as tiles. The highest score ever encountered on your site are stored and displayed in widget to encourage playing the game. Read the FAQ to understand more about the plugin.
+Join the numbers and get to the 2048 tile! This is a number combination game with the aim to achieve 2048 tile. Display the game based on the original 2048 design or customized the game appearance to your choice of colors, tile's text or numbers, font sizes or even use image as tiles. The highest score ever encountered on your site are stored and displayed in widget to encourage playing the game. The plugin also saves each logged-in user's high score if scoreboard is enabled. Read the FAQ to understand more about the plugin.
 
 **How to play:** Use your arrow keys to move the tiles. When two tiles with the same number touch, they merge into one!
 
@@ -33,6 +33,9 @@ Since version 0.3, the plugin can store each logged-in users high score is enabl
 
 When someone ended a game (either won or game over) and if their high score more than your site\'s high score or their personal high score record, the game will save the new score. It is automatically saved for any logged-in users. If you enable to allow guest users to submit high score, an email field will appear to them before the score submission. The email address is required to notify them of new high score updates.
 
+= Tips on using custom image for tiles =
+Minimum image dimension is 107px width and height. The game tiles resizes to 58px on smaller screens. Recommended to use a perfect square image. The plugin will force your image to appear in perfect square anyway. Do not use transparent PNGs as you will see overlapping image tiles when merging tiles.
+
 = How the use the custom shortcode generator? =
 On the *Custom Features* tab of plugin settings page, make the changes you wanted to customized colors, tiles text and font size, or using image as tiles. Check or uncheck the *Enabled Features* as required. Without saving the changes, click the **Generate** button and a textarea will be shown with the custom shortcode. Copy the shortcode and paste it on your page or post. Publish/save it to see the game in custom appearances.
 
@@ -48,6 +51,9 @@ Yes, technically it will work. Depends on your theme, your widget width may not 
 1. Widget that shows current highest score.
 
 == Changelog ==
+= 0.3.1 =
+* Fix: Plugin data removal and uninstall not working
+* Several minor bug fixes
 = 0.3 =
 * New: Stores high scores on each logged-in users
 * New: Score board listing site's users scores
@@ -76,5 +82,3 @@ Yes, technically it will work. Depends on your theme, your widget width may not 
 == Upgrade Notice ==
 = 0.3 =
 * Now store each users high score, scoreboard, play in full screen and several bug fixes plus enhancements
-= 0.2 =
-* Enhancements: Store High Score, Configurable Custom Colors and Image Tiles

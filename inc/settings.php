@@ -364,8 +364,8 @@ class WP2048_Settings extends WP2048
     {
         $new_input = array();
 		
-		$features = $input['feature'];
-		foreach($features as $type => $feature) { $new_input['feature'][$type] = absint($feature); }
+		if ( !empty($input['feature']) )
+			foreach($input['feature'] as $type => $feature) { $new_input['feature'][$type] = absint($feature); }
 		
 		// Custom Text Sanitization
 		$texts = $input['text'];
@@ -423,11 +423,11 @@ class WP2048_Settings extends WP2048
 			}
 		}
 		if ( !empty($error_color) ) {
-			$error_color = explode(", ",$error_color); //TODO
+			$error_color = implode(", ",$error_color);
 			add_settings_error(
 				'wp2048_hexcolor',
 				esc_attr( 'settings_updated' ),
-				__('Some color fields contains invalid HEX values. Invalid input has been discarded.','wp2048'),
+				__('Some color fields contains invalid HEX values. Invalid input has been discarded. Check tile ','wp2048').$error_color,
 				'error'
 			);
 		}
