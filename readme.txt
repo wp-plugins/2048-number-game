@@ -52,6 +52,7 @@ Yes, technically it will work. Depends on your theme, your widget width may not 
 
 == Changelog ==
 = 0.3.1 =
+* Fix: Scoreboard shows 0 score when no scores saved yet
 * Fix: Plugin data removal and uninstall not working
 * Several minor bug fixes
 = 0.3 =
